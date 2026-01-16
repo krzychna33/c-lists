@@ -2,6 +2,10 @@
 #include <stdlib.h>
 
 /*
+    Autor: Krzysztof Surazynski
+*/
+
+/*
  * BIDIRECTIONAL LIST VISUALIZATION:
  *
  *     NULL <- [Node1] <-> [Node2] <-> [Node3] -> NULL
@@ -141,10 +145,15 @@ void AddAt(List* list, int new_element, int position) {
         return;
     }
     
+    if (position < 0 || position > list->size) {
+        fprintf(stderr, "Invalid position");
+        return;
+    }
+    
     // Create new node
     Node* newNode = (Node*)malloc(sizeof(Node));
     if (newNode == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
+        fprintf(stderr, "Memory allocation failed");
         return;
     }
     newNode->data = new_element;
@@ -152,11 +161,22 @@ void AddAt(List* list, int new_element, int position) {
     int cursor_position = 0;
 
     Node *node_before_new_node = GetAt(list, position - 1);
+    if (node_before_new_node == NULL) {
+        fprintf(stderr, "Invalid position");
+        free(newNode); 
+        return;
+    }
 
     newNode->next = node_before_new_node->next;
     newNode->prev = node_before_new_node;
-    node_before_new_node->next->prev = newNode;
+    if (node_before_new_node->next != NULL) {
+        node_before_new_node->next->prev = newNode;
+    }
     node_before_new_node->next = newNode;
+    
+    if (newNode->next == NULL) {
+        list->tail = newNode;
+    }
 
     list->size++;
 }
@@ -187,6 +207,20 @@ void RemoveAt(List* list, int position) {
 
     free(node_to_remove);
     list->size--;
+}
+
+void Destroy(List* list) {
+    if (list == NULL) {
+        return;
+    }
+    
+    Node* current = list->head;
+    while (current != NULL) {
+        Node* next = current->next;
+        free(current);
+        current = next;
+    }
+    free(list);
 }
 
 void Display(List* list) {
@@ -238,8 +272,7 @@ int main() {
 
         Display(myList);
         
-        
-        free(myList);
+        Destroy(myList);
     }
     
     return 0;

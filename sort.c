@@ -1,6 +1,10 @@
 #define BILIST_NO_MAIN
 #include "bilist.c"
 
+/*
+    Autor: Krzysztof Surazynski
+*/
+
 static void BubbleSort(List* list) {
     if (list == NULL || list->head == NULL) {
         return;
